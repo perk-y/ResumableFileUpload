@@ -12,12 +12,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 
+@RestController
 public class FileController {
 
     @PostMapping(value = "/fileUpload")
@@ -29,10 +31,11 @@ public class FileController {
         String filename = request.getHeader("filename");
         System.out.println("Filename : " + filename);
         long fileSize = Long.parseLong(request.getHeader("fileSize"));
-        File f = new File("C:\\Users\\Sakshi\\Documents\\" + filename);
+        File f = new File("C:\\Users\\sakshi\\Videos\\Demo\\" + filename);
         if (f.exists() && !f.isDirectory()) {
             if (fileSize == f.length()) {
                 res.put("message", "File already exists on server");
+                System.out.println("File already exists on server");
             } else {
                 System.out.println("Started  Partial Upload");
 
@@ -47,7 +50,7 @@ public class FileController {
                             return;
                         }
                         megaBytes = mBytes;
-//                System.out.println("We are currently reading item " + pItems);
+
                         if (pContentLength == -1) {
                             System.out.println("So far, " + pBytesRead + " bytes have been read.");
                             if (response.getHeader("Content-Range") != null) {
@@ -81,11 +84,10 @@ public class FileController {
 
                 while (iterStream.hasNext()) {
                     FileItemStream item = iterStream.next();
-
                     InputStream stream = item.openStream();
                     if (!item.isFormField()) {
                         // Process the InputStream
-                        try (OutputStream out = new FileOutputStream("C:\\Users\\Sakshi\\Documents\\" + item.getName(), true)) {
+                        try (OutputStream out = new FileOutputStream("C:\\Users\\sakshi\\Videos\\Demo\\" + item.getName(), true)) {
                             IOUtils.copy(stream, out);
                             System.out.println("No of bytes Written: " + bytesWritten.getBytesWritten());
                         }
@@ -96,7 +98,7 @@ public class FileController {
             }
             return ResponseEntity.ok(res.toString());
         } else {
-            System.out.println("Started Upload");
+            System.out.println("Starting new file Upload");
 
 
             BytesWritten bytesWritten = new BytesWritten();
@@ -110,7 +112,7 @@ public class FileController {
                         return;
                     }
                     megaBytes = mBytes;
-//                System.out.println("We are currently reading item " + pItems);
+                    System.out.println("We are currently reading item " + pItems);
                     if (pContentLength == -1) {
                         System.out.println("So far, " + pBytesRead + " bytes have been read.");
                         if (response.getHeader("Content-Range") != null) {
@@ -147,7 +149,7 @@ public class FileController {
                 InputStream stream = item.openStream();
                 if (!item.isFormField()) {
                     // Process the InputStream
-                    try (OutputStream out = new FileOutputStream("C:\\Users\\Sakshi\\Documents\\" + item.getName())) {
+                    try (OutputStream out = new FileOutputStream("C:\\Users\\sakshi\\Videos\\Demo\\" + item.getName())) {
                         IOUtils.copy(stream, out);
                         System.out.println("No of bytes Written: " + bytesWritten.getBytesWritten());
                     }
@@ -162,9 +164,10 @@ public class FileController {
     }
 
     @GetMapping("/fileExists")
-    public ResponseEntity<?> checkIfFileExists(@RequestParam String filename, @RequestParam Integer fileSize) {
-        System.out.println(filename);
-        File f = new File("C:\\Users\\Sakshi\\Documents\\" + filename);
+    public ResponseEntity<?> checkIfFileExists(@RequestParam(defaultValue = "Frozen.2013.1080p.BluRay.x264.YIFY.mp4") String filename,
+                                               @RequestParam(defaultValue = "1755005744") Integer fileSize) {
+        System.out.println(  "Checking if File exists: " + filename);
+        File f = new File("C:\\Users\\sakshi\\Videos\\Demo\\" + filename);
 
         JSONObject res = new JSONObject();
 
